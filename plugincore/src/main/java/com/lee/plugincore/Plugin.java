@@ -17,6 +17,7 @@ import android.util.Log;
 
 import com.lee.plugincore.utils.Constants;
 import com.lee.plugincore.utils.DexUtil;
+import com.lee.plugincore.utils.PackageParserCompat;
 import com.lee.plugincore.utils.ReflectUtil;
 
 import java.io.File;
