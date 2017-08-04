@@ -2,10 +2,13 @@ package com.lee.plugincore;
 
 import android.app.Instrumentation;
 import android.content.Context;
+import android.os.Handler;
 
-import com.lee.plugincore.hook.HookHandler;
+import com.lee.plugincore.hook.HookCallback;
 import com.lee.plugincore.hook.HookInstrumentation;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 
 /**
@@ -33,7 +36,7 @@ public class PluginManager {
         mHostContext = context;
     }
 
-    public void init() {
+    public void hook() {
         try {
             //get sCurrentActivityThread
             Class<?> activityThreadClass = Class.forName("android.app.ActivityThread");
@@ -47,13 +50,26 @@ public class PluginManager {
             Instrumentation mInstrumentation = (Instrumentation) mInstrumentationField.get(sCurrentActivityThreadField);
             mInstrumentationField.set(sCurrentActivityThread, new HookInstrumentation(this, mInstrumentation));
 
-            // hook mH
+            // hook mCallback
             Field mHField = activityThreadClass.getDeclaredField("mH");
             mHField.setAccessible(true);
-            mHField.set(sCurrentActivityThread, new HookHandler());
+            Handler mH = (Handler) mHField.get(sCurrentActivityThread);
+            Field mCallbackField = mH.getClass().getDeclaredField("mCallback");
+            mCallbackField.setAccessible(true);
+            mCallbackField.set(mH, new HookCallback());
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void install(File apk) throws FileNotFoundException {
+        if (null == apk) {
+            throw new IllegalArgumentException("error : apk is null.");
+        }
+
+        if (!apk.exists()) {
+            throw new FileNotFoundException(apk.getAbsolutePath());
         }
     }
 }

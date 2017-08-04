@@ -14,6 +14,6 @@ public class CoreApp extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
-        PluginManager.getInstance(base).init();
+        PluginManager.getInstance(base).hook();
     }
 }

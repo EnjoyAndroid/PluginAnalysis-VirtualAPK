@@ -14,7 +14,7 @@ public class HookInstrumentation extends Instrumentation {
 
     private Instrumentation mBase;
 
-    PluginManager mPluginManager;
+    private PluginManager mPluginManager;
 
     public HookInstrumentation(PluginManager pluginManager, Instrumentation base) {
         this.mPluginManager = pluginManager;

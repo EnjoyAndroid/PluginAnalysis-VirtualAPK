@@ -9,7 +9,7 @@ import android.os.Message;
  * Date：2017/8/4 11:35
  */
 
-public class HookHandler implements Handler.Callback {
+public class HookCallback implements Handler.Callback {
 
     public static final int LAUNCH_ACTIVITY = 100;
 
