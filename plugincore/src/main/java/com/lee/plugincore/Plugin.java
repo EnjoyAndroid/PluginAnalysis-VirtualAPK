@@ -1,7 +1,6 @@
 package com.lee.plugincore;
 
 import android.app.Application;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -9,8 +8,6 @@ import android.content.pm.InstrumentationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageParser;
 import android.content.pm.PermissionInfo;
-import android.content.pm.ProviderInfo;
-import android.content.pm.ServiceInfo;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.util.Log;
@@ -50,10 +47,7 @@ public class Plugin {
 //    private PluginPackageManager mPackageManager;
 
     private Map<ComponentName, ActivityInfo> mActivityInfos;
-    private Map<ComponentName, ServiceInfo> mServiceInfos;
-    private Map<ComponentName, ActivityInfo> mReceiverInfos;
-    private Map<ComponentName, ProviderInfo> mProviderInfos;
-    private Map<String, ProviderInfo> mProviders; // key is authorities of provider
+
     private Map<ComponentName, InstrumentationInfo> mInstrumentationInfos;
 
     private Application mApplication;
@@ -98,42 +92,6 @@ public class Plugin {
         }
         this.mActivityInfos = Collections.unmodifiableMap(activityInfos);
         this.mPackageInfo.activities = activityInfos.values().toArray(new ActivityInfo[activityInfos.size()]);
-
-        // Cache services
-        Map<ComponentName, ServiceInfo> serviceInfos = new HashMap<ComponentName, ServiceInfo>();
-        for (PackageParser.Service service : this.mPackage.services) {
-            serviceInfos.put(service.getComponentName(), service.info);
-        }
-        this.mServiceInfos = Collections.unmodifiableMap(serviceInfos);
-        this.mPackageInfo.services = serviceInfos.values().toArray(new ServiceInfo[serviceInfos.size()]);
-
-        // Cache providers
-        Map<String, ProviderInfo> providers = new HashMap<String, ProviderInfo>();
-        Map<ComponentName, ProviderInfo> providerInfos = new HashMap<ComponentName, ProviderInfo>();
-        for (PackageParser.Provider provider : this.mPackage.providers) {
-            providers.put(provider.info.authority, provider.info);
-            providerInfos.put(provider.getComponentName(), provider.info);
-        }
-        this.mProviders = Collections.unmodifiableMap(providers);
-        this.mProviderInfos = Collections.unmodifiableMap(providerInfos);
-        this.mPackageInfo.providers = providerInfos.values().toArray(new ProviderInfo[providerInfos.size()]);
-
-        // Register broadcast receivers dynamically
-        Map<ComponentName, ActivityInfo> receivers = new HashMap<ComponentName, ActivityInfo>();
-        for (PackageParser.Activity receiver : this.mPackage.receivers) {
-            receivers.put(receiver.getComponentName(), receiver.info);
-
-            try {
-                BroadcastReceiver br = BroadcastReceiver.class.cast(Plugin.class.getClassLoader().loadClass(receiver.getComponentName().getClassName()).newInstance());
-                for (PackageParser.ActivityIntentInfo aii : receiver.intents) {
-                    this.mHostContext.registerReceiver(br, aii);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        this.mReceiverInfos = Collections.unmodifiableMap(receivers);
-        this.mPackageInfo.receivers = receivers.values().toArray(new ActivityInfo[receivers.size()]);
     }
 
 
